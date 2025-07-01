@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Evrak Takip Programı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 32px 24px 24px 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #2d3a4b;
+      margin-bottom: 32px;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+    }
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0 auto 24px auto;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #1e40af;
+    }
+    .btn-center {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .form-section {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5fa;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .form-row label {
+      font-weight: 500;
+      color: #374151;
+      flex: 1;
+    }
+    .form-row input[type="file"] {
+      flex: 2;
+      border: none;
+      background: none;
+    }
+    .form-row input[type="file"]::-webkit-file-upload-button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .form-row input[type="file"]:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .form-row .file-name {
+      font-size: 0.95rem;
+      color: #2563eb;
+      margin-left: 10px;
+    }
+    .success-message {
+      background: #d1fae5;
+      color: #065f46;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 18px;
+      font-weight: 500;
+      display: none;
+    }
+    .bina-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #e0e7ef;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+    .bina-input-row label {
+      font-weight: 600;
+      color: #1e293b;
+      min-width: 110px;
+    }
+    .bina-input-row input[type="text"] {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
+    }
+    /* Sorgu Alanı Stilleri */
+    .query-container {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .query-container h2 {
+      text-align: center;
+      color: #2d3a4b;
+      margin-bottom: 24px;
+    }
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
+    }
+    #resultsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .building-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .building-card h3 {
+      margin: 0 0 12px 0;
+      color: #1e40af;
+      border-bottom: 1px solid #dbeafe;
+      padding-bottom: 8px;
+    }
+    .building-card-header {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      gap: 8px;
+    }
+    .toggle-arrow {
+      font-size: 1.1em;
+      transition: transform 0.2s;
+      color: #1e40af;
+    }
+    .toggle-arrow.open {
+      transform: rotate(180deg);
+    }
+    .building-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .building-card ul.open {
+      display: flex;
+    }
+    .building-card a {
+      color: #1d4ed8;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .building-card a:hover {
+      text-decoration: underline;
+    }
+    .error-message {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 16px 4px 16px 4px;
+      }
+      .form-row, .bina-input-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .bina-input-row label {
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Evrak Takip Programı</h1>
+    <div class="btn-center"><button class="btn" id="addBuildingBtn">Yeni Bina Ekle</button></div>
+    <form id="buildingForm" style="display:none;">
+      <div class="bina-input-row">
+        <label for="binaNoInput">Bina Adı/Numarası:</label>
+        <input type="text" id="binaNoInput" name="binaNoInput" placeholder="Örn: Bina 1" required />
+      </div>
+      <div class="form-section" id="formFields"></div>
+      <button type="submit" class="btn" style="width:100%;margin-top:18px;">Kaydet</button>
+    </form>
+    <div class="success-message" id="successMsg">Kayıt başarıyla eklendi!</div>
+  </div>
+
+  <div class="container query-container">
+    <h2>Kayıtlı Binaları Sorgula</h2>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Bina adı ile ara...">
+      <button class="btn" id="searchBtn">Sorgula</button>
+    </div>
+    <div id="resultsContainer"></div>
+  </div>
+
+  <script>
+    const HEADERS = [
+      "Risk Değerlendirme",
+      "Acil Durum Planı",
+      "16 Saat İSG Eğitimi",
+      "Açılan Gözlemler",
+      "İş Kazası / Olay Araştırma",
+      "Periyodik Kontroller",
+      "İç Denetimler",
+      "Dış Denetimler",
+      "Kaza Ağırlık Oranı",
+      "KKD Zimmetleri",
+      "KKD Matrisi",
+      "Yıllık Eğitim Planı",
+      "Yıllık Çalışma Planı",
+      "Çalışan Temsilcileri"
+    ];
+    const serverUrl = 'http://localhost:3000';
+    const addBuildingBtn = document.getElementById('addBuildingBtn');
+    const buildingForm = document.getElementById('buildingForm');
+    const formFields = document.getElementById('formFields');
+    const binaNoInput = document.getElementById('binaNoInput');
+    const successMsg = document.getElementById('successMsg');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+
+    let files = {};
+
+    addBuildingBtn.addEventListener('click', () => {
+      // Formu temizle ve göster
+      formFields.innerHTML = '';
+      binaNoInput.value = '';
+      files = {};
+      HEADERS.forEach(header => {
+        const row = document.createElement('div');
+        row.className = 'form-row';
+        const label = document.createElement('label');
+        label.textContent = header;
+        label.htmlFor = `file_${header}`;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/pdf';
+        input.id = `file_${header}`;
+        input.required = false;
+        input.addEventListener('change', (e) => {
+          if (e.target.files[0]) {
+            files[header] = e.target.files[0];
+            fileNameSpan.textContent = e.target.files[0].name;
+          } else {
+            delete files[header];
+            fileNameSpan.textContent = '';
+          }
+        });
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.className = 'file-name';
+        row.appendChild(label);
+        row.appendChild(input);
+        row.appendChild(fileNameSpan);
+        formFields.appendChild(row);
+      });
+      buildingForm.style.display = 'block';
+      successMsg.style.display = 'none';
+      addBuildingBtn.style.display = 'none';
+    });
+
+    buildingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const binaNo = binaNoInput.value.trim();
+      if (!binaNo) {
+        alert('Bina adı/numarası zorunludur!');
+        binaNoInput.focus();
+        return;
+      }
+      let atLeastOne = false;
+      for (const header of HEADERS) {
+        if (files[header]) {
+          atLeastOne = true;
+          const formData = new FormData();
+          formData.append('file', files[header]);
+          formData.append('binaNo', binaNo);
+          formData.append('tip', header);
+          try {
+            const response = await fetch(`${serverUrl}/upload`, {
+              method: 'POST',
+              body: formData
+            });
+            const result = await response.json();
+            if (!result.success) {
+              alert(`'${header}' için yükleme hatası: ${result.message}`);
+              return;
+            }
+          } catch (err) {
+            alert(`'${header}' için sunucu hatası: ${err.message}`);
+            return;
+          }
+        }
+      }
+      if (!atLeastOne) {
+        alert('En az bir belge yüklemelisiniz!');
+        return;
+      }
+      buildingForm.reset();
+      buildingForm.style.display = 'none';
+      addBuildingBtn.style.display = 'inline-block';
+      successMsg.style.display = 'block';
+
+      // Kayıttan sonra bina listesini anında güncelle
+      fetchAndDisplayBuildings();
+
+      setTimeout(() => successMsg.style.display = 'none', 3000);
+    });
+
+    async function fetchAndDisplayBuildings(searchTerm = '') {
+      try {
+        const response = await fetch(`${serverUrl}/documents?search=${encodeURIComponent(searchTerm)}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: `Sunucuya ulaşılamadı (HTTP ${response.status})` }));
+          throw new Error(errorData.message);
+        }
+
+        const buildings = await response.json();
+        resultsContainer.innerHTML = ''; // Önceki sonuçları temizle
+
+        if (buildings.length === 0) {
+          resultsContainer.textContent = 'Kayıt bulunamadı.';
+          return;
+        }
+
+        buildings.forEach(building => {
+          const card = document.createElement('div');
+          card.className = 'building-card';
+
+          // Header ve ok
+          const header = document.createElement('div');
+          header.className = 'building-card-header';
+
+          const arrow = document.createElement('span');
+          arrow.className = 'toggle-arrow';
+          arrow.textContent = '▼';
+
+          const title = document.createElement('h3');
+          title.textContent = building._id;
+          title.style.margin = 0;
+          title.style.flex = '1';
+
+          header.appendChild(title);
+          header.appendChild(arrow);
+          card.appendChild(header);
+
+          // PDF listesi
+          const docList = document.createElement('ul');
+          if (building.documents && Array.isArray(building.documents)) {
+            building.documents.forEach(doc => {
+              const item = document.createElement('li');
+              const link = document.createElement('a');
+              link.href = `${serverUrl}/document/${doc._id}`;
+              link.textContent = `${doc.tip} (${doc.dosyaAdi})`;
+              link.target = '_blank';
+              item.appendChild(link);
+              docList.appendChild(item);
+            });
+          }
+          card.appendChild(docList);
+
+          // Ok ve başlığa tıklanınca aç/kapa
+          header.addEventListener('click', () => {
+            docList.classList.toggle('open');
+            arrow.classList.toggle('open');
+          });
+
+          resultsContainer.appendChild(card);
+        });
+
+      } catch (error) {
+        resultsContainer.innerHTML = `<div class="error-message">Hata: ${error.message}</div>`;
+        console.error('Sorgulama hatası:', error);
+      }
+    }
+
+    searchBtn.addEventListener('click', () => fetchAndDisplayBuildings(searchInput.value.trim()));
+    
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        fetchAndDisplayBuildings(searchInput.value.trim());
+      }
+    });
+
+    // Sayfa yüklendiğinde tüm binaları listele
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchAndDisplayBuildings();
+    });
+  </script>
+</body>
+</html> 

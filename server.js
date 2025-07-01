@@ -105,6 +105,17 @@ app.get('/document/:id', async (req, res) => {
   }
 });
 
+// Belirli bir bina ve tüm belgelerini silen endpoint
+app.delete('/building/:binaNo', async (req, res) => {
+  try {
+    const binaNo = req.params.binaNo;
+    const result = await Dokuman.deleteMany({ binaNo });
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Server is running on port: ' + PORT);

@@ -175,6 +175,16 @@
     .toggle-arrow.open {
       transform: rotate(180deg);
     }
+    .delete-icon {
+      font-size: 1.1em;
+      color: #b91c1c;
+      margin-left: 6px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .delete-icon:hover {
+      color: #ef4444;
+    }
     .building-card ul {
       list-style: none;
       padding: 0;
@@ -388,8 +398,33 @@
           title.style.margin = 0;
           title.style.flex = '1';
 
+          // Çöp kutusu simgesi
+          const deleteIcon = document.createElement('span');
+          deleteIcon.className = 'delete-icon';
+          deleteIcon.title = 'Bu binayı sil';
+          deleteIcon.textContent = '🗑️';
+          deleteIcon.addEventListener('click', async (e) => {
+            e.stopPropagation(); // Ok aç/kapa tetiklenmesin
+            if (confirm(`'${building._id}' adlı binayı ve tüm belgelerini silmek istediğinize emin misiniz?`)) {
+              try {
+                const response = await fetch(`${serverUrl}/building/${encodeURIComponent(building._id)}`, {
+                  method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.success) {
+                  fetchAndDisplayBuildings(searchInput.value.trim());
+                } else {
+                  alert('Silme işlemi başarısız: ' + (result.message || 'Bilinmeyen hata'));
+                }
+              } catch (err) {
+                alert('Sunucuya bağlanırken hata oluştu: ' + err.message);
+              }
+            }
+          });
+
           header.appendChild(title);
           header.appendChild(arrow);
+          header.appendChild(deleteIcon);
           card.appendChild(header);
 
           // PDF listesi
